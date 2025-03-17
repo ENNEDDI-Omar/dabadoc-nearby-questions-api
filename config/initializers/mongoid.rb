@@ -1,4 +1,6 @@
 # rubocop:todo all
+Mongoid.logger.level = Logger::DEBUG
+Mongo::Logger.logger.level = Logger::DEBUG
 Mongoid.configure do
   target_version = "9.0"
 
@@ -10,11 +12,13 @@ Mongoid.configure do
   # configuration, whenever possible, but if you prefer, you can set
   # configuration values here, instead:
   # 
-  #   config.log_level = :debug
+     config.log_level = :debug
   #
   # Note that the settings in config/mongoid.yml always take precedence,
   # whatever else is set here.
 end
+
+
  
 # Enable Mongo driver query cache for Rack
 # Rails.application.config.middleware.use(Mongo::QueryCache::Middleware)
