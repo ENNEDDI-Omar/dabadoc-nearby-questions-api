@@ -3,32 +3,41 @@ module Api
   module V1
     class QuestionsController < BaseController
       before_action :set_question, only: [:show, :update, :destroy]
-      skip_before_action :authenticate_user!, only: [:index, :show]
+      skip_before_action :authenticate_api_user!, only: [:index, :show]
 
       # GET /api/v1/questions
       def index
-        if params[:lat].present? && params[:lng].present?
-          coords = { 'latitude' => params[:lat].to_f, 'longitude' => params[:lng].to_f }
-          distance = params[:distance].present? ? params[:distance].to_i : 10 # default 10km
-          @questions = Question.near(coords, distance).order_by(created_at: :desc)
-        else
-          @questions = Question.all.order_by(created_at: :desc)
-        end
+        begin
+          if params[:lat].present? && params[:lng].present?
+            coords = { 'latitude' => params[:lat].to_f, 'longitude' => params[:lng].to_f }
+            distance = params[:distance].present? ? params[:distance].to_i : 10 # default 10km
+            @questions = Question.near(coords, distance).order_by(created_at: :desc)
 
-        # Ajouter la distance pour chaque question si des coordonnées sont fournies
-        if params[:lat].present? && params[:lng].present?
-          user_coords = { 'latitude' => params[:lat].to_f, 'longitude' => params[:lng].to_f }
-          @questions = @questions.map do |q|
-            q.attributes.merge('distance' => q.distance_to(user_coords))
+            # Ajouter la distance pour chaque question si des coordonnées sont fournies
+            user_coords = { 'latitude' => params[:lat].to_f, 'longitude' => params[:lng].to_f }
+
+            # Évitez d'utiliser map qui pourrait créer des problèmes avec les curseurs MongoDB
+            question_array = []
+            @questions.each do |q|
+              dist = q.distance_to(user_coords)
+              question_array << q.attributes.merge('distance' => dist)
+            end
+
+            # Trier par distance si demandé
+            if params[:sort] == 'distance'
+              question_array.sort_by! { |q| q['distance'] || Float::INFINITY }
+            end
+
+            render json: question_array
+          else
+            @questions = Question.all.order_by(created_at: :desc)
+            render json: @questions
           end
-
-          # Trier par distance si demandé
-          if params[:sort] == 'distance'
-            @questions = @questions.sort_by { |q| q['distance'] || Float::INFINITY }
-          end
+        rescue => e
+          Rails.logger.error("Erreur dans la requête de questions: #{e.message}")
+          Rails.logger.error(e.backtrace.join("\n"))
+          render json: { error: e.message }, status: :unprocessable_entity
         end
-
-        render json: @questions
       end
 
       # GET /api/v1/questions/:id

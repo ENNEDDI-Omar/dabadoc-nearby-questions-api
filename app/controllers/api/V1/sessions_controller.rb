@@ -3,7 +3,28 @@ module Api
     class SessionsController < Devise::SessionsController
       respond_to :json
 
+      def create
+        if params[:session] && params[:session][:user]
+          params[:user] = params[:session][:user]
+        elsif params[:session] && params[:session][:email] && params[:session][:password]
+          params[:user] = {
+            email: params[:session][:email],
+            password: params[:session][:password]
+          }
+        elsif params[:email] && params[:password] && !params[:user]
+          params[:user] = {
+            email: params[:email],
+            password: params[:password]
+          }
+        end
+
+        Rails.logger.debug "REFORMATTED LOGIN ATTEMPT: #{params.inspect}"
+        super
+      end
+
       private
+
+
 
       def respond_with(resource, _opts = {})
         render json: {

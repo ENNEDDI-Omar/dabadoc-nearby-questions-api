@@ -4,7 +4,7 @@ module Api
     class AnswersController < BaseController
       before_action :set_question
       before_action :set_answer, only: [:update, :destroy]
-      skip_before_action :authenticate_user!, only: [:index]
+      skip_before_action :authenticate_api_user!, only: [:index]
 
       # GET /api/v1/questions/:question_id/answers
       def index
