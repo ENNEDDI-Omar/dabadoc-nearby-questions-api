@@ -40,7 +40,7 @@ class User
   ## Relations avec les autres modèles
   has_many :questions, dependent: :destroy
   has_many :answers, dependent: :destroy
-  #has_many :favorites, dependent: :destroy
+  has_many :favorites, dependent: :destroy
   #has_many :favorite_questions, through: :favorites, source: :question
 
   ## Index pour améliorer les performances de recherche
