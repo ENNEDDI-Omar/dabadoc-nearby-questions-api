@@ -30,11 +30,18 @@ class User
   validates :email, presence: true, uniqueness: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :name, presence: true
+  validates :password, presence: true, length: { minimum: 6 }, if: :password_required?
+  validates :password_confirmation, presence: true, if: :password_required?
+
+  def password_required?
+    !persisted? || !password.nil? || !password_confirmation.nil?
+  end
 
   ## Relations avec les autres modèles
-  #has_many :questions
-  #has_many :answers
-  #has_many :favorites
+  #has_many :questions, dependent: :destroy
+  #has_many :answers, dependent: :destroy
+  #has_many :favorites, dependent: :destroy
+  #has_many :favorite_questions, through: :favorites, source: :question
 
   ## Index pour améliorer les performances de recherche
   index({ email: 1 }, { unique: true })
