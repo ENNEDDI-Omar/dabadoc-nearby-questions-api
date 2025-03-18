@@ -38,8 +38,8 @@ class User
   end
 
   ## Relations avec les autres modèles
-  #has_many :questions, dependent: :destroy
-  #has_many :answers, dependent: :destroy
+  has_many :questions, dependent: :destroy
+  has_many :answers, dependent: :destroy
   #has_many :favorites, dependent: :destroy
   #has_many :favorite_questions, through: :favorites, source: :question
 
@@ -48,9 +48,9 @@ class User
 
   ## Méthodes personnalisées
    # Récupérer toutes les questions favorites de l'utilisateur
-      #def favorite_questions
-        #Question.where(:id.in => favorites.pluck(:question_id))
-      #end
+      def favorite_questions
+        Question.where(:id.in => favorites.pluck(:question_id))
+      end
   # Methods pour rendre l'utilisateur sérialisable en JSON
     def as_json(options = {})
       super(options.merge({ except: [:encrypted_password, :reset_password_token] }))
