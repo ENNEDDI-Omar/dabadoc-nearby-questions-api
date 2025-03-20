@@ -9,7 +9,7 @@ Devise.setup do |config|
     ]
     jwt.expiration_time = 30.days.to_i
 
-    # Ajoutez cette ligne pour configurer l'extraction du token
+
     jwt.request_formats = { user: [:json] }
   end
 end
