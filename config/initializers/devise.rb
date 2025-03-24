@@ -284,14 +284,20 @@ Devise.setup do |config|
   # end
   ######################################################################""
   config.warden do |manager|
-   manager.failure_app = Proc.new do |env|
-   response = {
-   'error' => 'Non autorisé',
-   'message' => 'Vous devez être connecté pour accéder à cette ressource.'
-  }
+    manager.failure_app = Proc.new do |env|
 
-  [ 401, { 'Content-Type' => 'application/json' }, [ response.to_json ] ]
-  end
+      warden_message = env['warden.options'][:message] || "No authentication details provided"
+      warden_message = warden_message.to_s if warden_message.respond_to?(:to_s)
+
+      response = {
+        'error' => 'Unauthorized',
+        'message' => 'Authentication required to access this resource.',
+        'details' => warden_message,
+        'attempted_path' => env['PATH_INFO']
+      }
+
+      [ 401, { 'Content-Type' => 'application/json' }, [ response.to_json ] ]
+    end
   end
 
   # ==> Mountable engine configurations

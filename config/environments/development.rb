@@ -15,6 +15,16 @@ Rails.application.configure do
   # Enable server timing.
   config.server_timing = true
 
+  config.after_initialize do
+    Warden::Manager.after_set_user do |user, auth, opts|
+      Rails.logger.debug "Warden: Utilisateur connecté: #{user.email}"
+    end
+
+    Warden::Manager.before_failure do |env, opts|
+      Rails.logger.debug "Warden: Échec d'authentification: #{opts.inspect}"
+    end
+  end
+
   # Enable/disable Action Controller caching. By default Action Controller caching is disabled.
   # Run rails dev:cache to toggle Action Controller caching.
   if Rails.root.join("tmp/caching-dev.txt").exist?

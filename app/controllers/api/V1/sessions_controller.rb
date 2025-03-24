@@ -20,7 +20,7 @@ module Api
         end
 
         begin
-          self.resource = warden.authenticate!(scope: :user)
+          self.resource = warden.authenticate!(auth_options)
           sign_in(resource_name, resource)
 
           token = request.env['warden-jwt_auth.token']
