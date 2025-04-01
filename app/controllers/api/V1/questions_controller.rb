@@ -8,19 +8,24 @@ module Api
       # GET /api/v1/questions
       def index
         begin
+
           if params[:lat].present? && params[:lng].present?
             coords = { 'latitude' => params[:lat].to_f, 'longitude' => params[:lng].to_f }
             distance = params[:distance].present? ? params[:distance].to_i : 10 # default 10km
-            @questions = Question.near(coords, distance).order_by(created_at: :desc)
+
+            @questions = Question.near(coords, distance).limit(18).order_by(created_at: :desc)
 
             # Ajouter la distance pour chaque question si des coordonnées sont fournies
             user_coords = { 'latitude' => params[:lat].to_f, 'longitude' => params[:lng].to_f }
 
-            # Évitez d'utiliser map qui pourrait créer des problèmes avec les curseurs MongoDB
             question_array = []
             @questions.each do |q|
               dist = q.distance_to(user_coords)
-              question_array << q.attributes.merge('distance' => dist)
+              question_array << q.attributes.merge(
+                'distance' => dist,
+                'user' => q.user.as_json(only: [:id, :name, :email]),
+                'answers_count' => q.answers_count
+              )
             end
 
             # Trier par distance si demandé
@@ -78,6 +83,8 @@ module Api
         @question.destroy
         head :no_content
       end
+
+
 
       private
 
