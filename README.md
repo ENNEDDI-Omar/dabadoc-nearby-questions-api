@@ -76,6 +76,13 @@ You can generate a secure key using:
       "password": "password123"
     }
 ```
+## Project Structure
+
+app/controllers/api/v1 - API controllers for the application
+app/models - MongoDB models for the application
+config/routes.rb - API route definitions
+config/initializers - Configuration files for Devise, JWT, Mongoid, etc.
+
 ## Questions Endpoints
 
 GET /api/v1/questions - List all questions (with optional location parameters)
@@ -98,10 +105,5 @@ GET /api/v1/favorites - List user's favorite questions
 POST /api/v1/questions/:question_id/favorites - Add a question to favorites
 DELETE /api/v1/questions/:question_id/favorites - Remove a question from favorites
 
-## Project Structure
 
-app/controllers/api/v1 - API controllers for the application
-app/models - MongoDB models for the application
-config/routes.rb - API route definitions
-config/initializers - Configuration files for Devise, JWT, Mongoid, etc.
       
